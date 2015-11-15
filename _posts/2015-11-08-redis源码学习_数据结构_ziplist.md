@@ -1,6 +1,6 @@
 ---
 layout: post
-author: gosaturn
+author: GoSaturn
 title: redis源码学习——压缩列表ziplist
 category: 技术学习
 tag: [redis]
