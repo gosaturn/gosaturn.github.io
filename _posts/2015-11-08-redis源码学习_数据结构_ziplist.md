@@ -41,7 +41,6 @@ zlend： 压缩列表结尾符，值为255，1B(unsigned int)
 
 ##entry结构
 
-```
 {% highlight C %}
 typedef struct zlentry{
 	unsigned int   prevrawlensize, prevrawlen;
@@ -54,15 +53,14 @@ typedef struct zlentry{
 	unsigned char  *p;
 }
 {% endhighlight %}
-```
 
 
-```
+
 {% highlight C %}
 |前一个节点的编码&长度    |当前节点编码&长度     |当前节点内容|
 <previous_entry_length>|<encoding & length>|<content> |
 {% endhighlight %}
-```
+
 
 `previous_entry_length`有两种长度：
 
@@ -90,7 +88,6 @@ typedef struct zlentry{
 
 `定义压缩列表节点的encoding值`
 
-```
 {% highlight C %}
 /* Different encoding/length possibilities */定义不同的encoding
 //str
@@ -102,22 +99,21 @@ typedef struct zlentry{
 #define ZIP_INT_32B (0xc0 | 1<<4)
 #define ZIP_INT_64B (0xc0 | 2<<4)
 {% endhighlight %}
-```
+
 
 `计算数据类型`
 
-```
 {% highlight C %}
 /* Macro's to determine type */计算encoding对应的数据类型，str 或 int
 //将上面的宏带入enc，得到true或false。
 #define ZIP_IS_STR(enc) (((enc) & 0xc0) < 0xc0) //'&'按位与，1&1=1，1&0=0
 #define ZIP_IS_INT(enc) (!ZIP_IS_STR(enc) && ((enc) & 0x30) < 0x30)
 {% endhighlight %}
-```
+
 
 ##ziplist应用
 ###创建空的ziplist
-```
+
 {% highlight C %}
 //创建并返回一个新的ziplist，其中entry为空
 unsigned char *ziplistNew(void) {
@@ -135,10 +131,10 @@ unsigned char *ziplistNew(void) {
     return zl;
 }
 {% endhighlight %}
-```
+
 
 ###给ziplist插入entry节点
-```
+
 {% highlight C %}
 //将长度为slen的字符串s，插入zl中，返回插入了entry元素的ziplist
 unsigned char *ziplistPush(unsigned char *zl, unsigned char *s, unsigned int slen, int where) {
@@ -150,10 +146,10 @@ unsigned char *ziplistPush(unsigned char *zl, unsigned char *s, unsigned int sle
     return __ziplistInsert(zl,p,s,slen);
 }
 {% endhighlight %}
-```
+
 其中，插入节点可能会涉及到`连锁更新`
 ##初始化entry
-```
+
 {% highlight C %}
 //将p指向的压缩列表节点所对应的属性信息保存到zlentry结构体中，并返回zlentry结构体。(相当于给zlentry结构体的各个字段赋值)
 static zlentry zipEntry(unsigned char *p) {
@@ -175,4 +171,4 @@ static zlentry zipEntry(unsigned char *p) {
     return e;
 }
 {% endhighlight %}
-```
+
