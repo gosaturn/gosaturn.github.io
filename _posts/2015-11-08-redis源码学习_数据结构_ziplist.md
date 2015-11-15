@@ -3,7 +3,7 @@ layout: post
 author: GoSaturn
 title: redis源码学习——压缩列表ziplist
 category: 技术学习
-tag: [redis,markdown]
+tag: [redis]
 ---
 # 压缩列表ziplist
 ##ziplist简介
@@ -23,11 +23,11 @@ list-max-ziplist-value 64 //每个entry所占的字节大小
 
 
 ##ziplist结构
-```
+{% highlight C %}
 <zlbytes>|<zltail>|<zllen>|<entry>...<entry>|<zlend>
 4B       |   4B   |    2B |                 |  1B
 |<------header----------->|  
-```
+{% endhighlight %}
 
 zlbytes： 存储整个压缩列表所占字节数，4B(unsigned int)
 
