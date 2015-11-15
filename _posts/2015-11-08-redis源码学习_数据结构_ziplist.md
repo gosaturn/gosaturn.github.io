@@ -3,7 +3,7 @@ layout: post
 author: GoSaturn
 title: redis源码学习——压缩列表ziplist
 category: 技术学习
-tag: [redis]
+tag: [redis,markdown]
 ---
 # 压缩列表ziplist
 ##ziplist简介
