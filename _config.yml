@@ -1,11 +1,14 @@
 # Dependencies
-markdown:         rdiscount
-highlighter:      pygments
+#markdown:         rdiscount
+#highlighter:      pygments
+permalink: /:categories/:year/:month/:day/:title 
 
+exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
+highlighter: pygments
 #
 encoding:         "utf-8"
 # Permalinks
-permalink:        pretty
+#permalink:        pretty
 
 # Setup
 title:            On the way 
