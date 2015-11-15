@@ -1,19 +1,19 @@
 # Dependencies
-#markdown:         rdiscount
-#highlighter:      pygments
-permalink: /:categories/:year/:month/:day/:title 
+markdown:         rdiscount
+highlighter:      pygments
+#permalink: /:categories/:year/:month/:day/:title 
 
-exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
-highlighter: pygments
+#exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
+#highlighter: pygments
 #
 encoding:         "utf-8"
 # Permalinks
-#permalink:        pretty
+permalink:        pretty
 
 # Setup
 title:            On the way 
 tagline:          'day day up...'
-description:      '      To be a better man'
+description:      'To be a better man'
 
 author:
   name:           'gosaturn'
