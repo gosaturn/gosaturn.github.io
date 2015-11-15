@@ -15,9 +15,11 @@ tag: [redis]
  - 对于用户来说，其实不用关心什么时候用ziplist，redis底层会根据数据量多少以及每项数据大小，判断是否采用ziplist结构存储数据（当数据量超过限定值时，会传化成其他的数据结构）。
 
 ```
+{% highlight %}
 //redis.conf文件
 list-max-ziplist-entries 512 //ziplist中entry个数
 list-max-ziplist-value 64 //每个entry所占的字节大小
+{% endhighlight %}
 ```
 
 ##ziplist结构
