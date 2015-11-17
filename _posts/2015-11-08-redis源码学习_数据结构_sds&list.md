@@ -2,7 +2,7 @@
 layout: post
 author: GoSaturn
 title: redis源码学习——字符串&双端链表
-category: 技术学习
+category: 源码学习
 tag: [redis]
 ---
 #字符串（SDS）
