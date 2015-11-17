@@ -1,15 +1,10 @@
 ##this is my blog
-博客搭载在github上，地址:gosaturn.github.io
-
-
-
-
+地址:gosaturn.github.io
 
 ##Author
-博客原作者:Mark Otto 
+博客模板原作者:Mark Otto 
 [github](github.com/mdo)
-
-博客修改:SooHu
-
+博客模板修改:SooHu
+多谢两位贡献模板~
 ##License
 MIT
