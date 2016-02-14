@@ -1,0 +1,156 @@
+---
+layout: post
+author: GoSaturn
+title: git总结——git踩过的坑
+category: 基础知识
+tag: [git]
+---
+
+> 主要总结下在实际使用过程中，经常会用到的几个命令
+
+##git rebase
+>应用场景：
+>比如A和B同时在master分支上修改，A先提交，并push到远程分支origin/master，这个时候，B再提交并push到远程分支时，为了保证代码是当前分支上最新的，就需要先把A修改的部分合并进来。
+>这个时候可以用git rebase解决
+
+1. 首先执行`git fetch`，将远程分支上的内容同步到本地；
+2. 执行`git rebase -i origin/master`（-i参数表示交互式的rebase），提示如下信息：
+
+ {% highlight C %}
+  1 pick fbae807 media top level
+  2 
+  3 # Rebase 0484c1a..fbae807 onto 0484c1a
+  4 #
+  5 # Commands:
+  6 #  p, pick = use commit
+  7 #  r, reword = use commit, but edit the commit message
+  8 #  e, edit = use commit, but stop for amending
+  9 #  s, squash = use commit, but meld into previous commit
+ 10 #  f, fixup = like "squash", but discard this commit's log message
+ 11 #  x, exec = run command (the rest of the line) using shell
+ 12 #
+ 13 # These lines can be re-ordered; they are executed from top to bottom.
+ 14 #
+ 15 # If you remove a line here THAT COMMIT WILL BE LOST.
+ 16 #
+ 17 # However, if you remove everything, the rebase will be aborted.
+ 18 #
+ 19 # Note that empty commits are commented out
+ {% endhighlight %}
+ 
+3. 退出编辑，如果没有冲突，则提示
+```
+Successfully rebased and updated refs/heads/master.
+```
+4. 如果执行rebase过程中如果遇到冲突，会提示如下信息：
+```
+remote: Counting objects: 14, done
+remote: Finding sources: 100% (10/10)
+remote: Total 10 (delta 7), reused 10 (delta 7)
+Unpacking objects: 100% (10/10), done.
+From gitr:/***/service/media
+   0484c1a..0932a56  master     -> origin/master
+   8d7264f..0932a56  test       -> origin/test
+First, rewinding head to replay your work on top of it...
+Applying: media top level
+Using index info to reconstruct a base tree...
+M       client.py
+M       handler.py
+M       server.py
+Falling back to patching base and 3-way merge...
+Auto-merging server.py
+CONFLICT (content): Merge conflict in server.py
+Auto-merging handler.py
+Auto-merging client.py
+CONFLICT (content): Merge conflict in client.py
+Failed to merge in the changes.
+Patch failed at 0001 media top level
+The copy of the patch that failed is found in:
+   /***/service/media/.git/rebase-apply/patch
+
+When you have resolved this problem, run "git rebase --continue".
+If you prefer to skip this patch, run "git rebase --skip" instead.
+To check out the original branch and stop rebasing, run "git rebase --abort".
+```
+5. 手动合并冲突后，执行`git add`
+6. 然后执行`git rebase --continue`
+
+##回退/回滚到上一个版本
+```
+git revert changed-Id
+```
+changed-Id就是想回滚到的那个版本对应的changed-Id，可以通过`git log`查看
+
+##合并两次提交
+>比如同一个分支，commit了多次，想把多次提交合并为一个
+
+执行`git fetch`
+然后执行`git rebase -i origin/master`
+```
+  1 pick 18ffe32 new meidia list
+  2 pick 72d5cb5 subscribe ui cost optimization
+  3 
+  4 # Rebase 0f20bfd..72d5cb5 onto 0f20bfd
+  5 #
+  6 # Commands:
+  7 #  p, pick = use commit
+  8 #  r, reword = use commit, but edit the commit message
+  9 #  e, edit = use commit, but stop for amending
+ 10 #  s, squash = use commit, but meld into previous commit
+ 11 #  f, fixup = like "squash", but discard this commit's log message
+ 12 #  x, exec = run command (the rest of the line) using shell
+ 13 #
+ 14 # These lines can be re-ordered; they are executed from top to bottom.
+ 15 #
+ 16 # If you remove a line here THAT COMMIT WILL BE LOST.
+ 17 #
+ 18 # However, if you remove everything, the rebase will be aborted.
+ 19 #
+ 20 # Note that empty commits are commented out
+ 
+".git/rebase-merge/git-rebase-todo" 20L, 681C written
+```
+如果想把第二次提交合并到第一次提交上，这边第二行的pick改为`squash`（合并提交，将这次提交合并到之前的一次提交里面）即可，然后退出编辑，提示如下信息：
+```
+Rebasing (2/2)
+  1 # This is a combination of 2 commits.
+  2 # The first commit's message is:
+  3 
+  4 new meidia list
+  5 
+  6 Change-Id: Ie9a37da53dab1e06a95bb8ae7bf70afe87507f9f
+  7 
+  8 
+  9 # Please enter the commit message for your changes. Lines starting
+ 10 # with '#' will be ignored, and an empty message aborts the commit.
+ 11 #
+ 12 # Date:      Thu Jan 28 10:58:22 2016 +0800
+ 13 #
+ 14 # rebase in progress; onto 0f20bfd
+ 15 # You are currently editing a commit while rebasing branch 'master' on '0f20bfd'.
+ 16 #
+ 17 # Changes to be committed:
+ 18 #       modified:   dal.py
+ 19 #       modified:   urls.py
+ 20 #       modified:   util.py
+ 21 #       modified:   views.py
+ 22 #
+ 23 # Untracked files:
+ 24 #       dal.py.1
+~                                                                                                                                                    
+~                                                                                                                                                    
+~                                                                                                                                                    
+~                                                                                                                                                    
+~                                                                                                                                                    
+".git/COMMIT_EDITMSG" 33L, 707C written
+[detached HEAD c374ca4] new meidia list
+ Date: Thu Jan 28 10:58:22 2016 +0800
+ 4 files changed, 372 insertions(+), 3 deletions(-)
+Successfully rebased and updated refs/heads/master.
+```
+表示成功的将两次提交合并为一次，接下来执行git push origin master即可。
+
+
+##git基础
+[git远程分支](https://git-scm.com/book/zh/v1/Git-%E5%88%86%E6%94%AF-%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF)
+[git rebase](https://git-scm.com/book/zh/v1/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E8%A1%8D%E5%90%88)
