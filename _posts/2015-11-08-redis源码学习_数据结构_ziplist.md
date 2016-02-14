@@ -5,7 +5,7 @@ title: redis源码学习——压缩列表ziplist
 category: 源码学习
 tag: [redis]
 ---
-##ziplist简介
+## ziplist简介
 
  - 压缩列表是由一系列 `特殊编码的` `连续内存块` 组成的 `顺序型` 存储结构。主要是为了`节省内存空间`而设计的数据结构。
  - 压缩列表可以用来存储字符串或整数。
@@ -13,19 +13,19 @@ tag: [redis]
  - redis中的 列表list，哈希表hashtable，有序集合sorted set 的底层实现中都用到了ziplist。
  - 对于用户来说，其实不用关心什么时候用ziplist，redis底层会根据数据量多少以及每项数据大小，判断是否采用ziplist结构存储数据（当数据量超过限定值时，会传化成其他的数据结构）。
 
-{% highlight C %}
+```c
 //redis.conf文件
 list-max-ziplist-entries 512 //ziplist中entry个数
 list-max-ziplist-value 64 //每个entry所占的字节大小
-{% endhighlight %}
+```
 
-##ziplist结构
+## ziplist结构
 
-{% highlight C %}
+```c
 <zlbytes>|<zltail>|<zllen>|<entry>...<entry>|<zlend>
 4B       |   4B   |    2B |                 |  1B
 |<------header----------->|  
-{% endhighlight %}
+```
 
 
 zlbytes： 存储整个压缩列表所占字节数，4B(unsigned int)
@@ -38,9 +38,9 @@ entry: 压缩列表节点，节点大小根据存储的内容确定
 
 zlend： 压缩列表结尾符，值为255，1B(unsigned int)
 
-##entry结构
+## entry结构
 
-{% highlight C %}
+```c
 typedef struct zlentry{
 	unsigned int   prevrawlensize, prevrawlen;
 	//prevrawlen前一个节点长度， prevrawlensize 前一个节点编码所占字节数
@@ -51,13 +51,13 @@ typedef struct zlentry{
 	unsigned char  encoding;
 	unsigned char  *p;
 }
-{% endhighlight %}
+```
 
 
-{% highlight C %}
+```c
 |前一个节点的编码&长度    |当前节点编码&长度     |当前节点内容|
 <previous_entry_length>|<encoding & length>|<content> |
-{% endhighlight %}
+```
 
 
 `previous_entry_length`有两种长度：
@@ -66,6 +66,7 @@ typedef struct zlentry{
  - 如果前一个字节长度大于254B，则previous_entry_length长度为5B，第一个字节为254(1111 1110)，后面4个字节保存实际长度值
 
 `encoding&length` ziplist有两种类型的编码：字符串&整数。
+
 >通过encoding的前两个比特位判断content保存的是字符串还是整数，00，01，10表示字符串，11表示整数
 
 **字符串：**
@@ -86,7 +87,7 @@ typedef struct zlentry{
 
 `定义压缩列表节点的encoding值`
 
-{% highlight C %}
+```c
 
 /* Different encoding/length possibilities */定义不同的encoding
 //str
@@ -98,25 +99,25 @@ typedef struct zlentry{
 #define ZIP_INT_32B (0xc0 | 1<<4)
 #define ZIP_INT_64B (0xc0 | 2<<4)
 
-{% endhighlight %}
+```
 
 
 `计算数据类型`
 
-{% highlight C %}
+```c
 
 /* Macro's to determine type */计算encoding对应的数据类型，str 或 int
 //将上面的宏带入enc，得到true或false。
 #define ZIP_IS_STR(enc) (((enc) & 0xc0) < 0xc0) //'&'按位与，1&1=1，1&0=0
 #define ZIP_IS_INT(enc) (!ZIP_IS_STR(enc) && ((enc) & 0x30) < 0x30)
 
-{% endhighlight %}
+```
 
 
-##ziplist应用
-###创建空的ziplist
+## ziplist应用
+### 创建空的ziplist
 
-{% highlight C %}
+```c
 
 //创建并返回一个新的ziplist，其中entry为空
 unsigned char *ziplistNew(void) {
@@ -134,12 +135,12 @@ unsigned char *ziplistNew(void) {
     return zl;
 }
 
-{% endhighlight %}
+```
 
 
-###给ziplist插入entry节点
+### 给ziplist插入entry节点
 
-{% highlight C %}
+```c
 
 //将长度为slen的字符串s，插入zl中，返回插入了entry元素的ziplist
 unsigned char *ziplistPush(unsigned char *zl, unsigned char *s, unsigned int slen, int where) {
@@ -151,12 +152,13 @@ unsigned char *ziplistPush(unsigned char *zl, unsigned char *s, unsigned int sle
     return __ziplistInsert(zl,p,s,slen);
 }
 
-{% endhighlight %}
+```
 
 其中，插入节点可能会涉及到`连锁更新`
-##初始化entry
 
-{% highlight C %}
+## 初始化entry
+
+```c
 
 //将p指向的压缩列表节点所对应的属性信息保存到zlentry结构体中，并返回zlentry结构体。(相当于给zlentry结构体的各个字段赋值)
 static zlentry zipEntry(unsigned char *p) {
@@ -178,5 +180,5 @@ static zlentry zipEntry(unsigned char *p) {
     return e;
 }
 
-{% endhighlight %}
+```
 
